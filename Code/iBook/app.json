@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "IBookPJ",
+    "slug": "IBookPJ",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/iBook.png",
+    "splash": {
+      "image": "./assets/iBook.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#191927"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
