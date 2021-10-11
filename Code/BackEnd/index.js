@@ -25,21 +25,8 @@ const options = {
 };
 
 const specs = swaggerJsDoc(options);
-
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 
-
-// Code สร้าง Api เพื่อยิง require ไปให้ React Native ใช้งานได้
-
-// ดึงข้อมูลประเภทหนังสือทั้งหมด
-app.get("/category", async (req, res) => {
-  try {
-    const allTodos = await pool.query("SELECT content, COUNT(book_id) FROM category RIGHT JOIN booklist ON category.id = booklist.category_id GROUP BY category.content;");
-    res.json(allTodos.rows);
-  } catch (err) {
-    console.error(err.message);
-  }
-});
 
  /**
   * @swagger
@@ -50,7 +37,7 @@ app.get("/category", async (req, res) => {
 
 /**
  * @swagger
- * /mybooks:
+ * /books:
  *   get:
  *     summary: Returns the list of all the books
  *     tags: [Books]
@@ -62,8 +49,7 @@ app.get("/category", async (req, res) => {
  *             schema:
  *               type: array
  */
-// ดึงข้อมูลหนังสือทั้งหมดที่ join กับข้อมูลประเภทหนังสือ
-app.get("/mybooks", async (req, res) => {
+app.get("/books", async (req, res) => {
   try {
     const allTodos = await pool.query("SELECT * FROM booklist INNER JOIN category ON booklist.category_id=category.id;");
     res.json(allTodos.rows);
@@ -71,17 +57,6 @@ app.get("/mybooks", async (req, res) => {
     console.error(err.message);
   }
 });
-
-// ดึงข้อมูลของผู้ใช้งานทั้งหมด
-app.get("/useraccount", async (req, res) => {
-  try {
-    const allTodos = await pool.query("SELECT * FROM useraccount");
-    res.json(allTodos.rows);
-  } catch (err) {
-    console.error(err.message);
-  }
-});
-// Done
 
 /**
  * @swagger
@@ -115,6 +90,43 @@ app.get("/book/:id", async (req, res) => {
   }
 });
 
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// Base APIs iBook App
+
+// Code สร้าง Api เพื่อยิง require ไปให้ React Native ใช้งานได้
+
+// ดึงข้อมูลประเภทหนังสือทั้งหมด
+app.get("/category", async (req, res) => {
+  try {
+    const allTodos = await pool.query("SELECT content, COUNT(book_id) FROM category RIGHT JOIN booklist ON category.id = booklist.category_id GROUP BY category.content;");
+    res.json(allTodos.rows);
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+// ดึงข้อมูลหนังสือทั้งหมดที่ join กับข้อมูลประเภทหนังสือ
+app.get("/mybooks", async (req, res) => {
+  try {
+    const allTodos = await pool.query("SELECT * FROM booklist INNER JOIN category ON booklist.category_id=category.id;");
+    res.json(allTodos.rows);
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+// ดึงข้อมูลของผู้ใช้งานทั้งหมด
+app.get("/useraccount", async (req, res) => {
+  try {
+    const allTodos = await pool.query("SELECT * FROM useraccount");
+    res.json(allTodos.rows);
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+// ดึงประวัติการเช่ายืมหนังสือทั้งหมดของ user ที่ระบุ id user
 app.post("/getmybooks", async (req, res) => {
   try {
     const allTodos = await pool.query("SELECT * FROM (SELECT * FROM payment where useraccount_id = " + req.body.id_user + ") as useraccount join booklist on useraccount.booklist_id = booklist.book_id;");
