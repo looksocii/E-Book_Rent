@@ -1,10 +1,33 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const swaggerUI = require("swagger-ui-express");
+const swaggerJsDoc = require("swagger-jsdoc");
 const pool = require("./DB");
 
 app.use(cors());
 app.use(express.json());
+
+const options = {
+	definition: {
+		info: {
+			title: "Appication iBook APIs",
+			version: "1.0.0",
+			description: "A simple APIs with pgAdmin",
+		},
+		servers: [
+			{
+				url: "http://localhost:5000",
+			},
+		],
+	},
+	apis: ["index.js"],
+};
+
+const specs = swaggerJsDoc(options);
+
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
+
 
 // Code สร้าง Api เพื่อยิง require ไปให้ React Native ใช้งานได้
 
@@ -18,6 +41,27 @@ app.get("/category", async (req, res) => {
   }
 });
 
+ /**
+  * @swagger
+  * tags:
+  *   name: iBook App
+  *   description: iBook Using JS
+  */
+
+/**
+ * @swagger
+ * /mybooks:
+ *   get:
+ *     summary: Returns the list of all the books
+ *     tags: [Books]
+ *     responses:
+ *       200:
+ *         description: The list of the books
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ */
 // ดึงข้อมูลหนังสือทั้งหมดที่ join กับข้อมูลประเภทหนังสือ
 app.get("/mybooks", async (req, res) => {
   try {
@@ -37,16 +81,40 @@ app.get("/useraccount", async (req, res) => {
     console.error(err.message);
   }
 });
+// Done
 
+/**
+ * @swagger
+ * /book/{id}:
+ *   get:
+ *     summary: Get the book by id
+ *     tags: [Books]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: int
+ *         required: true
+ *         description: The book id
+ *     responses:
+ *       200:
+ *         description: The book description by id
+ *         contens:
+ *           application/json:
+ *       404:
+ *         description: The book was not found
+ */
 // ดึงประวัติการเช่ายืมหนังสือทั้งหมดของ user ที่ระบุ id user
-app.post("/getmybooks", async (req, res) => {
+app.get("/book/:id", async (req, res) => {
   try {
-    const allTodos = await pool.query("SELECT * FROM (SELECT * FROM payment where useraccount_id = " + req.body.id_user + ") as useraccount join booklist on useraccount.booklist_id = booklist.book_id;");
+    console.log("SELECT * FROM booklist where id = " + req.params.id + ";");
+    const allTodos = await pool.query("SELECT * FROM booklist where id = " + req.params.id + ";");
     res.json(allTodos.rows);
   } catch (err) {
     console.error(err.message);
   }
 });
+
 
 // เพิ่มข้อมูลผู้ใช้ใหม่หรือที่สมัครเข้ามาใหม่
 app.post('/signup', async (req, res) => {
