@@ -115,6 +115,14 @@ app.get("/book/:id", async (req, res) => {
   }
 });
 
+app.post("/getmybooks", async (req, res) => {
+  try {
+    const allTodos = await pool.query("SELECT * FROM (SELECT * FROM payment where useraccount_id = " + req.body.id_user + ") as useraccount join booklist on useraccount.booklist_id = booklist.book_id;");
+    res.json(allTodos.rows);
+  } catch (err) {
+    console.error(err.message);
+  }
+});
 
 // เพิ่มข้อมูลผู้ใช้ใหม่หรือที่สมัครเข้ามาใหม่
 app.post('/signup', async (req, res) => {
